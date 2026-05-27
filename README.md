@@ -4,18 +4,6 @@ An AI-powered question paper generator for teachers. Upload a reference document
 
 **Live Demo:** [https://vedaai-assessment-creator-rhk7.vercel.app](https://vedaai-assessment-creator-rhk7.vercel.app)
 
----
-
-## Screenshots
-
-> Add screenshots here:
-> - `docs/screenshots/dashboard.png` — Assignment dashboard
-> - `docs/screenshots/create.png` — Create assignment form
-> - `docs/screenshots/generating.png` — Live generation progress
-> - `docs/screenshots/output.png` — Generated question paper
-> - `docs/screenshots/answer-key.png` — Answer key toggle
-
----
 
 ## Features
 

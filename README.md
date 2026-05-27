@@ -8,6 +8,34 @@ An AI-powered question paper generator for teachers. Upload a reference document
 
 ---
 
+## Assignment Requirements Coverage
+
+| Requirement | How It's Met |
+|---|---|
+| File upload (PDF / image) | multer accepts PDF + images up to 25MB; pdf-parse extracts PDF text; Groq vision model describes images |
+| Due date, question types, marks, instructions | All fields in the create form with Zod validation (no empty/negative values) |
+| Proper validation | React Hook Form + Zod schema on frontend; Zod validates AI response on backend before saving |
+| Zustand for state management | `assignmentStore`, `generationStore`, `toastStore` — all Zustand |
+| WebSocket management | Socket.IO with per-assignment rooms; connect/disconnect lifecycle managed in generating page; polling fallback if socket event missed |
+| Structured prompt → AI generation | `prompt.service.ts` builds a structured prompt; AI returns sections (A, B…), questions, difficulty, marks |
+| Do not render raw LLM response | AI JSON is validated via Zod, mapped to typed interfaces, and rendered as a structured exam paper component |
+| MongoDB | Stores assignments + generated papers (sections, questions, answers) |
+| Redis | Caches assignment list; invalidated on create/delete |
+| BullMQ | Background job queue for generation; worker runs 5 steps with progress tracking |
+| WebSocket real-time updates | Each worker step emits a Socket.IO event; `currentStep` also saved to DB for replay on reconnect |
+| Output page — student info section | Name, Roll Number, Class input lines rendered in `ExamPaper.tsx` |
+| Output page — sections with title + instruction + questions | Each section has title, instruction, and numbered questions list |
+| Each question — text + difficulty + marks | Rendered in `QuestionSection.tsx` |
+| PDF export | `@react-pdf/renderer` — proper formatted PDF, not raw HTML print |
+| Regenerate action | Regenerate button re-enqueues the generation job |
+| Difficulty badges | Easy (green) / Medium (yellow) / Hard (red) badges per question |
+| **Bonus** — Answer key toggle | Answers generated in same AI call, hidden by default, toggled by teacher |
+| **Bonus** — Voice input | Web Speech API mic button on additional instructions field |
+| **Bonus** — Subject colour coding | Cards colour-tagged by subject on dashboard |
+| **Bonus** — Due date warnings | Overdue / due today / due soon badges on assignment cards |
+
+---
+
 ## What It Does
 
 Teachers often spend hours writing question papers. VedaAI automates this — a teacher uploads a textbook page, diagram, or PDF, selects how many questions of each type they want (MCQ, short answer, long answer etc.), and the AI generates a fully formatted, print-ready question paper with an optional answer key.

@@ -6,9 +6,20 @@ interface Props {
   onTranscript: (text: string) => void;
 }
 
+type AnySpeechRecognition = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult: ((e: { results: { [key: number]: { [key: number]: { transcript: string } }; length: number } }) => void) | null;
+  onend: (() => void) | null;
+  onerror: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
 export function VoiceInput({ onTranscript }: Props) {
   const [listening, setListening] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<AnySpeechRecognition | null>(null);
 
   function toggle() {
     if (listening) {
@@ -17,22 +28,22 @@ export function VoiceInput({ onTranscript }: Props) {
       return;
     }
 
-    const SpeechRecognition =
-      window.SpeechRecognition || (window as unknown as { webkitSpeechRecognition: typeof window.SpeechRecognition }).webkitSpeechRecognition;
+    const w = window as unknown as Record<string, new () => AnySpeechRecognition>;
+    const SpeechRecognitionCtor = w.SpeechRecognition || w.webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
+    if (!SpeechRecognitionCtor) {
       alert('Voice input is not supported in this browser. Try Chrome.');
       return;
     }
 
-    const recognition = new SpeechRecognition();
+    const recognition = new SpeechRecognitionCtor();
     recognition.lang = 'en-US';
     recognition.interimResults = false;
     recognition.continuous = false;
 
     recognition.onresult = (e) => {
-      const transcript = Array.from(e.results)
-        .map((r) => r[0].transcript)
+      const transcript = Array.from({ length: e.results.length })
+        .map((_, i) => e.results[i][0].transcript)
         .join(' ');
       onTranscript(transcript);
     };
